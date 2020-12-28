@@ -22,7 +22,6 @@ func (app SimpleApplication) Run() {
 		if err != nil {
 			log.Fatalln(err)
 		}
-		lock.Unlock()
 
 		wg := sync.WaitGroup{}
 		wg.Add(1)
@@ -30,6 +29,8 @@ func (app SimpleApplication) Run() {
 		if !exist {
 			// application is Active
 			app.zkConn.Create("/master", []byte("master_test"), zk.FlagEphemeral, zk.WorldACL(zk.PermAll))
+			lock.Unlock()
+
 			fmt.Println("This Process's Role is Active")
 
 			// Destroy Active app
@@ -38,6 +39,7 @@ func (app SimpleApplication) Run() {
 			return
 		}
 
+		lock.Unlock()
 		// application is Standby
 		fmt.Println("This Process's Role is Standby")
 
