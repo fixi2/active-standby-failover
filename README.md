@@ -9,10 +9,16 @@ zookeeper를 사용하여 active-standby 이중화 구성 테스트
 - 가장 먼저 /Controller를 선점하는 Broker가 Controller의 역할 수행
 - /Master 노드를 선점하는 프로세스가 Master 역할을 하도록 구성해보자.
 
-### 문제점
+#### 문제점
 <img src="https://media.oss.navercorp.com/user/16779/files/4389cd00-4939-11eb-9cdb-069fe13c8404" width="50%" >
 
 - Standby 3개 프로세스가 모두 Master가 된다. Lock을 도입해봐야 할듯
+
+### Distribute Lock 도입
+
+![ezgif com-gif-maker (1)](https://media.oss.navercorp.com/user/16779/files/13452d00-493f-11eb-90af-6956c7c04795)
+
+- Active -> Standby failover가 정상적으로 수행된다.
 
 ### Leader Election
 

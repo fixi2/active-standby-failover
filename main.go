@@ -10,33 +10,35 @@ import (
 )
 
 type SimpleApplication struct {
-	Role   string   // Active, StandBy or Master, Slave
 	zkConn *zk.Conn // zookeeper connection
 }
 
 func (app SimpleApplication) Run() {
+	lock := zk.NewLock(app.zkConn, "/lock", zk.WorldACL(zk.PermAll))
 
 	for {
+		lock.Lock()
 		exist, _, w, err := app.zkConn.ExistsW("/master")
 		if err != nil {
 			log.Fatalln(err)
 		}
+		lock.Unlock()
 
 		wg := sync.WaitGroup{}
 		wg.Add(1)
 
 		if !exist {
+			// application is Active
 			app.zkConn.Create("/master", []byte("master_test"), zk.FlagEphemeral, zk.WorldACL(zk.PermAll))
-			app.Role = "Active"
 			fmt.Println("This Process's Role is Active")
 
-			// master destory
+			// Destroy Active app
 			time.Sleep(time.Second * 5)
 			os.Exit(-1)
 			return
 		}
 
-		app.Role = "StandBy"
+		// application is Standby
 		fmt.Println("This Process's Role is Standby")
 
 		// waiting for watch notify
